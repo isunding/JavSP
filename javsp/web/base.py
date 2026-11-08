@@ -12,10 +12,12 @@ from tqdm import tqdm
 from lxml import etree
 from lxml.html.clean import Cleaner
 from requests.models import Response
+from urllib.parse import urlparse
 
 
 from javsp.config import Cfg
 from javsp.web.exceptions import *
+from javsp.web.image_payload import APP_CDN_HOST, deobfuscate_image_bytes
 
 
 __all__ = ['Request', 'get_html', 'post_html', 'request_get', 'resp2html', 'is_connectable', 'download', 'get_resp_text', 'read_proxy']
@@ -216,21 +218,27 @@ def urlretrieve(url, filename=None, reporthook=None, headers=None):
     with contextlib.closing(requests.get(url, headers=headers,
                                          proxies=read_proxy(), stream=True)) as r:
         header = r.headers
-        with open(filename, 'wb+') as fp:
-            bs = 1024
-            size = -1
-            blocknum = 0
-            if "content-length" in header:
-                size = int(header["Content-Length"])    # 文件总大小（理论值）
-            if reporthook:                              # 写入前运行一次回调函数
-                reporthook(blocknum, bs, size)
-            for chunk in r.iter_content(chunk_size=1024):
-                if chunk:
-                    fp.write(chunk)
-                    fp.flush()
-                    blocknum += 1
-                    if reporthook:
-                        reporthook(blocknum, bs, size)  # 每写入一次运行一次回调函数
+        bs = 1024
+        size = -1
+        blocknum = 0
+        if "content-length" in header:
+            size = int(header["Content-Length"])    # 文件总大小（理论值）
+        if reporthook:                              # 写入前运行一次回调函数
+            reporthook(blocknum, bs, size)
+        chunks = []
+        for chunk in r.iter_content(chunk_size=1024):
+            if chunk:
+                chunks.append(chunk)
+                blocknum += 1
+                if reporthook:
+                    reporthook(blocknum, bs, size)  # 每收到一块运行一次回调函数
+    data = b''.join(chunks)
+    # JavDB app CDN 的图片字节带单字节 XOR 混淆（移植自 SakuraMedia 的
+    # image_payload.py）；若不还原，落盘后 PIL 无法解码，封面/预览图会被判为损坏
+    if url.startswith('http') and urlparse(url).hostname == APP_CDN_HOST:
+        data = deobfuscate_image_bytes(data)
+    with open(filename, 'wb+') as fp:
+        fp.write(data)
 
 
 def download(url, output_path, desc=None):
