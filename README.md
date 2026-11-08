@@ -10,9 +10,8 @@
 
 ![License](https://img.shields.io/github/license/isunding/JavSP)
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
-![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-green.svg)
+![Python 3.10 ~ 3.12](https://img.shields.io/badge/python-3.10%20~%203.12-green.svg)
 [![Latest release](https://img.shields.io/github/v/release/isunding/JavSP)](https://github.com/isunding/JavSP/releases/latest)
-[![Crawlers test](https://img.shields.io/github/actions/workflow/status/isunding/JavSP/test-web-funcs.yml?label=crawlers%20test)](https://github.com/isunding/JavSP/actions/workflows/test-web-funcs.yml)
 [![Build](https://img.shields.io/github/actions/workflow/status/isunding/JavSP/cx_freeze.yml?label=build)](https://github.com/isunding/JavSP/actions/workflows/cx_freeze.yml)
 
 ## 功能特点
@@ -23,7 +22,7 @@
 - [x] 可自定义文件夹与文件命名规则、分类方式
 - [x] 基于 AI 人体分析裁剪素人等非常规封面
 - [x] 翻译标题与剧情简介（Google / Bing / 百度 / Claude / OpenAI）
-- [x] 每天自动测试各站点抓取器是否可用
+- [x] 内置抓取器可用性测试（`unittest` + GitHub Actions 工作流）
 - [x] JavDB 通过官方 App JSON 接口抓取，无需浏览器 Cookies、无需绕过 CloudFlare
 - [ ] 匹配本地字幕
 - [ ] 使用小缩略图创建文件夹封面
