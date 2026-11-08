@@ -23,12 +23,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        # macos-13 已下线（对应 runner 不再提供，job 会一直排队），改用当前受支持的 macos-15（x64）
+        os: [ubuntu-latest, windows-latest, macos-15]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: 'true'
 
@@ -39,7 +40,7 @@ jobs:
         run: pipx install poetry
 
       - name: Setup Python 3.10
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.10'
           cache: 'poetry'
@@ -60,7 +61,7 @@ jobs:
           echo "VERSION=`poetry run python tools/version.py`" >> $GITHUB_ENV
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: JavSP-${{ env.VERSION }}-${{ matrix.os }}
           path: dist
