@@ -22,9 +22,14 @@ jobs:
     name: Build binaries on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      # 单个平台失败不影响其它平台继续构建
+      fail-fast: false
       matrix:
-        # macos-13 已下线（对应 runner 不再提供，job 会一直排队），改用当前受支持的 macos-15（x64）
-        os: [ubuntu-latest, windows-latest, macos-15]
+        # macos-13 已下线（runner 不再提供，job 会一直排队）。
+        # 这里必须用 macos-15-intel（x64）：macos-15 是 arm64，而 slimeface 只提供
+        # cp310 的 macosx x86_64 轮子，arm64 上会退回源码编译并因缺少
+        # libfacedetection 子模块失败。
+        os: [ubuntu-latest, windows-latest, macos-15-intel]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
