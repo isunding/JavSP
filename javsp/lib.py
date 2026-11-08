@@ -16,8 +16,21 @@ def re_escape(s: str) -> str:
 
 
 def resource_path(path: str) -> str:
-    """获取一个随代码打包的文件在解压后的路径"""
+    """获取一个随代码打包的文件在解压后的路径。
+
+    PyInstaller 单文件 exe 会把资源解压到 ``sys._MEIPASS``，而旧逻辑在冻结
+    状态下只返回相对路径（即 exe 的工作目录），导致打包时附带的资源找不到。
+    这里改为：优先使用 exe 所在工作目录下的同名文件（方便用户按盘覆盖
+    config.yml），不存在时回退到打包进 exe 的默认资源；cx_Freeze 的打包方式
+    没有 _MEIPASS，行为与原来保持一致。
+    """
     if getattr(sys, "frozen", False):
+        cwd_path = Path.cwd() / path
+        if cwd_path.exists():
+            return str(cwd_path)
+        bundle_root = getattr(sys, '_MEIPASS', None)
+        if bundle_root:
+            return str(Path(bundle_root) / path)
         return path
     else:
         path_joined = Path(__file__).parent.parent / path
