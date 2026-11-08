@@ -25,13 +25,19 @@ def resource_path(path: str) -> str:
     没有 _MEIPASS，行为与原来保持一致。
     """
     if getattr(sys, "frozen", False):
-        cwd_path = Path.cwd() / path
-        if cwd_path.exists():
-            return str(cwd_path)
+        # 一律以 exe 所在目录为准，而不是启动时的工作目录：双击、快捷方式、
+        # 或者从别的目录调用，读到的都是同一份 config.yml
+        base_dir = Path(sys.executable).resolve().parent
+        candidate = base_dir / path
+        if candidate.exists():
+            return str(candidate)
         bundle_root = getattr(sys, '_MEIPASS', None)
         if bundle_root:
-            return str(Path(bundle_root) / path)
-        return path
+            bundled = Path(bundle_root) / path
+            if bundled.exists():
+                return str(bundled)
+        # 两边都没有时返回 exe 同目录路径，让报错信息指向用户应当放置文件的位置
+        return str(candidate)
     else:
         path_joined = Path(__file__).parent.parent / path
         return str(path_joined)

@@ -6,6 +6,7 @@ import time
 import logging
 from PIL import Image
 from pydantic import ValidationError
+from confz.exceptions import FileException
 from pydantic_extra_types.pendulum_dt import Duration
 import requests
 import threading
@@ -587,9 +588,12 @@ def error_exit(success, err_info):
 def entry():
     try:
         Cfg()
+    except FileException:
+        print(f'未找到配置文件，请将 config.yml 放到程序同目录：{resource_path("config.yml")}')
+        sys.exit(1)
     except ValidationError as e:
         print(e.errors())
-        exit(1)
+        sys.exit(1)
 
     global actressAliasMap
     if Cfg().crawler.normalize_actress_name:

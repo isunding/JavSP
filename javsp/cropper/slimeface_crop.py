@@ -1,3 +1,5 @@
+import sys
+
 from PIL import Image
 from javsp.cropper.interface import Cropper, DefaultCropper
 from javsp.cropper.utils import get_bound_box_by_face
@@ -26,7 +28,7 @@ if __name__ == '__main__':
 
     if(args.image is None):
         print("USAGE: slimeface_crop.py -i/--image [path]")
-        exit(1)
+        sys.exit(1)
 
     input = Image.open(args.image)
     im = SlimefaceCropper().crop(input)

@@ -40,7 +40,8 @@ def select_folder(default_dir=''):
     """使用文件对话框提示用户选择一个文件夹"""
     if not USE_GUI:
         logger.error("无法打开窗口，请通过命令行的方式输入扫描路径")
-        exit(1)
+        # 打包成 exe 后 site 内置的 exit() 不存在，必须用 sys.exit
+        sys.exit(1)
     window = Tk()
     window.withdraw()
     window.iconbitmap(resource_path('image/JavSP.ico'))
