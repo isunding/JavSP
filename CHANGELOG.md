@@ -1,8 +1,11 @@
 # Changelog
 
-## [Unreleased](https://github.com/Yuukiy/Javsp/compare/v1.8...HEAD)
+## v1.9.0 - 2026-11-08
 
 ### Added
+- JavDB 抓取器改用官方 App JSON 接口（`/api/v2/search` + `/api/v4/movies/{id}`），移植自 [SakuraMedia](https://github.com/tinypinglite/sakuramediabe)，不再依赖浏览器 Cookies 与 CloudFlare 绕过 [9eb2d59](https://github.com/isunding/JavSP/commit/9eb2d59)
+- 新增 `JAVSP_JAVDB_*` 环境变量，可覆盖 API 域名、超时、重试次数与代理；`JAVSP_JAVDB_LEGACY_FALLBACK=1` 可回退旧网页抓取器
+- 新增 `tools/build_onefile.py`：用 PyInstaller 打包单文件 exe，只读资源内置、`config.yml` 外置 [c9eb311](https://github.com/isunding/JavSP/commit/c9eb311)
 - 添加无码和字幕的水印 [#73](https://github.com/Yuukiy/JavSP/commit/eaedc84049597eaab1ba064229f9b5bcf38aa504)
 - 支持刮削剧照 [#176](https://github.com/Yuukiy/JavSP/issues/176)
 - direnv 适配 [134b279](https://github.com/Yuukiy/JavSP/commit/134b279151aead587db0b12d1a30781f2e1be5b1)
@@ -16,6 +19,10 @@
 - 添加选项`other.interactive`来表示程序是否应该在interactive模式下运行
 
 ### Changed
+- JavDB 详情字段改由 App 接口直接映射（标题/原名/简介/评分/时长/导演/片商/系列/女优/标签/预览图），旧网页抓取器完整保留在 `javsp/web/javdb_html.py`
+- 下载层自动还原 JavDB app CDN（`tp.spfcas.com`）图片的单字节 XOR 混淆；NFO 中的女优头像改写为未混淆的网页 CDN 地址 [9eb2d59](https://github.com/isunding/JavSP/commit/9eb2d59)
+- `resource_path` 在打包后以 exe 所在目录为基准读取配置与资源，不再受启动时工作目录影响 [c6a21c5](https://github.com/isunding/JavSP/commit/c6a21c5)
+- 更新检查在缺少包元数据时跳过，版本号改为构建时注入 [9045f01](https://github.com/isunding/JavSP/commit/9045f01)
 - 使用 Poetry 作为构建系统 [134b279](https://github.com/Yuukiy/JavSP/commit/134b279151aead587db0b12d1a30781f2e1be5b1)
 - 使用 Cx_Freeze 作为打包工具 [134b279](https://github.com/Yuukiy/JavSP/commit/134b279151aead587db0b12d1a30781f2e1be5b1)
 - 将 Groq 翻译接口重构为 OpenAI 通用翻译接口 [#371](https://github.com/Yuukiy/JavSP/pull/371)
@@ -37,6 +44,11 @@
 - 为了引入对类型注释的支持，最低Python版本现在为3.10
 
 - 重构封面剪裁逻辑 [#380](https://github.com/Yuukiy/JavSP/pull/380)
+
+### Fixed
+- 修复打包为 exe 后裸 `exit()` 触发 `NameError` 的问题（改用 `sys.exit()`）[c6a21c5](https://github.com/isunding/JavSP/commit/c6a21c5)
+- 缺少 `config.yml` 时给出明确提示，而不是抛出异常堆栈
+- 修复未安装为发行包时 `importlib.metadata.version('javsp')` 抛 `PackageNotFoundError` 导致启动失败的问题 [9045f01](https://github.com/isunding/JavSP/commit/9045f01)
 
 ### Removed
 - Pyinstaller 打包描述文件 [134b279](https://github.com/Yuukiy/JavSP/commit/134b279151aead587db0b12d1a30781f2e1be5b1)
